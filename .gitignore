@@ -93,6 +93,7 @@ output/submission/*
 
 
 # CSV and Excel files inside src/
-src/*.csv
-src/*.xls
-src/*.xlsx
+*.csv
+*.xls
+*.xlsx
+*.pdf
