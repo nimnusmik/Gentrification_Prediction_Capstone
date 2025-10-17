@@ -1,326 +1,306 @@
-# Gentrification Prediction in Seoul Using Transformer-Based Deep Learning
+# 서울시 젠트리피케이션 예측 모델: Transformer 기반 딥러닝 연구
 
-## Overview
+## 프로젝트 개요
+
 <img width="615" height="301" alt="image" src="https://github.com/user-attachments/assets/e3bdc2d0-d4f8-42ba-ada6-e69fd60acf51" />
 
+본 프로젝트는 서울시 상권의 다차원 사회경제적 및 공간 데이터를 활용하여 젠트리피케이션 패턴을 분석하고 예측합니다. MariaDB 기반 인프라에 다양한 데이터셋을 통합하여 도시 변화 추세를 파악하고, 군집화 및 딥러닝 기법을 활용한 예측 모델을 구축했습니다.
 
+## 연구 목표
 
-This project analyzes and predicts gentrification patterns in Seoul's commercial districts using multidimensional socioeconomic and spatial data. By integrating various datasets into a MariaDB-based infrastructure, we identified urban transformation trends and built a predictive model leveraging clustering and deep learning techniques.
+- 상권 데이터 기반 도시 젠트리피케이션 패턴 탐지
+- 사회경제적 변화 초기 징후를 보이는 지역 군집 식별
+- 데이터 기반 미래 젠트리피케이션 위험도 분석 프레임워크 개발
+- 도시 정책입안자를 위한 실질적 인사이트 제공: 주민 이탈 방지 및 지속가능한 개발 지원
 
-## Research Objectives
-- Detect patterns of urban gentrification based on commercial district data
-- Identify regional clusters showing early signs of socioeconomic transformation
-- Develop a data-driven predictive framework for future gentrification risk analysis
-- Provide actionable insights for urban policymakers to prevent displacement and support sustainable development
+## 데이터셋 상세
 
-## Dataset Description
+### 데이터 출처
 
-### Data Sources
-- Seoul Open Data Plaza (서울시 열린 데이터 광장)
-- Seoul Commercial District Analysis Service
-- Ministry of Land, Infrastructure and Transport (국토교통부)
-- Regional business registries
+- 서울시 열린 데이터 광장
+- 서울시 상권분석서비스
+- 국토교통부
+- 지역 사업자 등록 데이터
 
-### Data Categories
-**Commercial & Economic Indicators:**
-- Commercial rent and business turnover rates
-- Monthly average income and expenditure by category (food, clothing, medical, transportation, leisure, culture, education, entertainment)
-- Business operation duration and closure rates
+### 데이터 카테고리
 
-**Demographic Data:**
-- Population distribution by age group (10s, 20s, 30s, 40s, 50s, 60+)
-- Living population by time period and day of week
-- Gender distribution
+**상업 및 경제 지표**
+- 상권 임대료 및 사업체 회전율
+- 월평균 소득 및 지출: 식품, 의류, 의료, 교통, 여가, 문화, 교육, 오락 카테고리별
+- 사업체 운영 기간 및 폐업률
 
-**Infrastructure & Spatial Features:**
-- Attraction facilities (집객시설): general hospitals, regular hospitals, high schools, universities, department stores, supermarkets, theaters, lodging facilities, subway stations, bus stops
-- Building usage and zoning information
-- Apartment complex data and average prices
+**인구통계 데이터**
+- 연령대별 인구 분포: 10대, 20대, 30대, 40대, 50대, 60대 이상
+- 시간대별 및 요일별 생활인구
+- 성별 분포
 
-### Data Period
-- Training data: Q1 2020 - Q4 2022 (quarterly)
-- Prediction target: 2023
+**인프라 및 공간 특성**
+- 집객시설: 종합병원, 일반병원, 고등학교, 대학교, 백화점, 대형마트, 극장, 숙박시설, 지하철역, 버스정류장
+- 건물 용도 및 용도지역 정보
+- 아파트 단지 데이터 및 평균 가격
 
-### Database Infrastructure
-All raw data were normalized and stored in **MariaDB** for efficient querying, integration, and scalability.
+### 데이터 기간
 
-## Methodology
+- 학습 데이터: 2020년 1분기 ~ 2022년 4분기 (분기별)
+- 예측 대상: 2023년
 
-### 1. Data Integration & Preprocessing
-- Combined heterogeneous data formats (CSV, JSON, API responses) into a unified relational schema using SQL
-- Handled missing values through statistical imputation
-- Applied MinMaxScaler normalization to standardize feature scales
-- Created binary indicators for commercial district types (U: tourist zone, R: traditional market, D: developed commercial area, A: alley commercial area)
+### 데이터베이스 인프라
 
-### 2. Gentrification Diagnosis Framework
-Based on the Korean Ministry of Land, Infrastructure and Transport's gentrification diagnosis system, districts were classified into four stages:
+모든 원시 데이터를 **MariaDB**에 정규화하여 저장함으로써 효율적인 쿼리, 통합 및 확장성을 확보했습니다.
 
-- **Stage 0 (Initial)**: No gentrification or post-gentrification decline; inactive commercial area
-- **Stage 1 (Caution)**: Early gentrification signs due to low rent, policy initiatives, or consumption trend changes; capital inflow beginning
-- **Stage 2 (Warning)**: Rapid gentrification progress with rent increases, area popularity, and frequent business type changes
-- **Stage 3 (Risk)**: Final stage with over-commercialization and involuntary displacement; high probability of commercial decline
+## 연구 방법론
 
-### 3. Clustering Analysis
-**Method**: K-Means clustering with Elbow Method optimization
+### 1. 데이터 통합 및 전처리
 
-**Process:**
-- Identified known gentrified areas (Garosu-gil, Hongdae, Sinchon, Ewha, Seongsu, Jongno, Seodaemun) as reference points
-- Applied Elbow Method to determine optimal cluster number (K=4)
-- Validated clustering quality with Silhouette Score (0.3 for K=4) and PCA visualization
-- Cluster distribution: 2,098 / 1,120 / 913 / 732 samples across 4 clusters
+- 이질적인 데이터 형식(CSV, JSON, API 응답)을 SQL 기반 통합 관계형 스키마로 결합
+- 통계적 대체법을 통한 결측치 처리
+- MinMaxScaler 정규화로 특성 스케일 표준화
+- 상권 유형별 이진 지표 생성
+  - U: 관광특구
+  - R: 전통시장
+  - D: 발달상권
+  - A: 골목상권
 
-**Cluster Characteristics:**
-- Cluster 0 (Warning Stage): Highest in attraction facilities, living population, apartment units, and total expenditure
-- Cluster 1 (Initial Stage): Low infrastructure but longest average business operation duration
-- Cluster 2 (Risk Stage): Low population and facilities but high apartment prices and expenditure; highest gentrification indicator
-- Cluster 3 (Caution Stage): High facilities and population but low apartment units; insufficient infrastructure despite capital inflow
+### 2. 젠트리피케이션 진단 프레임워크
 
-### 4. Machine Learning Models
+국토교통부의 젠트리피케이션 진단 시스템을 기반으로 상권을 4단계로 분류:
 
-#### Logistic Regression
-- Accuracy: 0.592 (59.2%)
-- ROC-AUC: Below 0.9 for most classes (excluding class 0)
-- Conclusion: Insufficient for multi-class classification with complex features
+- **0단계 (초기)**: 젠트리피케이션 미발생 또는 쇠퇴 후 상황, 비활성 상권
+- **1단계 (주의)**: 낮은 임대료, 정책 지원, 소비 트렌드 변화로 인한 초기 징후, 자본 유입 시작
+- **2단계 (경고)**: 임대료 상승, 지역 인기 증가, 업종 변화 빈번한 급속한 진행 단계
+- **3단계 (위험)**: 과도한 상업화 및 비자발적 이주 발생, 상권 쇠퇴 가능성 높은 최종 단계
 
-#### Model Selection with PyCaret 3.2.0
-Evaluated multiple regression models using RMSE as the primary metric:
+### 3. 군집 분석
 
-| Model | RMSE |
-|-------|------|
+**방법론**: Elbow Method를 활용한 K-Means 군집화 최적화
+
+**프로세스**
+- 기존 젠트리피케이션 지역(가로수길, 홍대, 신촌, 이대, 성수, 종로, 서대문) 참조점 설정
+- Elbow Method로 최적 군집 수 결정 (K=4)
+- Silhouette Score(0.3)와 PCA 시각화로 군집 품질 검증
+- 군집별 데이터 분포: 2,098 / 1,120 / 913 / 732개 샘플
+
+**군집 특성**
+- **군집 0 (경고 단계)**: 집객시설, 생활인구, 아파트 단지 수, 총지출액 최고
+- **군집 1 (초기 단계)**: 인프라는 낮지만 평균 사업체 운영기간 최장
+- **군집 2 (위험 단계)**: 인구와 시설은 낮지만 아파트 가격과 지출 높음, 젠트리피케이션 지표 최고
+- **군집 3 (주의 단계)**: 시설과 인구는 많지만 아파트 단지 수 적음, 자본 유입 대비 인프라 부족
+
+### 4. 머신러닝 모델
+
+#### 로지스틱 회귀
+
+- 정확도: 0.592 (59.2%)
+- ROC-AUC: 대부분 클래스에서 0.9 미만 (클래스 0 제외)
+- 결론: 복잡한 특성을 가진 다중 클래스 분류에 부적합
+
+#### PyCaret 3.2.0 기반 모델 선정
+
+RMSE를 주요 평가 지표로 여러 회귀 모델 평가:
+
+| 모델 | RMSE |
+|------|------|
 | Extra Trees Regressor | **0.0364** |
 | Random Forest Regressor | **0.0372** |
 | Light Gradient Boosting | 0.0504 |
 | Decision Tree Regressor | 0.0456 |
 
-**Selected Models**: Extra Trees Regressor (ET) and Random Forest Regressor (RF)
+**선정 모델**: Extra Trees Regressor (ET), Random Forest Regressor (RF)
 
-**Feature Importance Analysis:**
+**특성 중요도 분석**
 
-*Extra Trees Regressor Top Features:*
-1. Traditional Market (상권 구분 코드 R): 0.2777
-2. Developed Commercial Area (상권 구분 코드 D): 0.1717
-3. Education Expenditure: 0.0543
-4. Medical Expenditure: 0.0505
-5. Total Expenditure: 0.0485
+*Extra Trees Regressor 주요 특성*
+1. 전통시장 (상권 구분 코드 R): 0.2777
+2. 발달상권 (상권 구분 코드 D): 0.1717
+3. 교육 지출: 0.0543
+4. 의료 지출: 0.0505
+5. 총지출액: 0.0485
 
-*Random Forest Regressor Top Features:*
-1. Traditional Market (상권 구분 코드 R): 0.3058
-2. Developed Commercial Area (상권 구분 코드 D): 0.1854
-3. Education Expenditure: 0.1745
-4. Male Living Population: 0.0889
-5. Clothing Expenditure: 0.0558
+*Random Forest Regressor 주요 특성*
+1. 전통시장 (상권 구분 코드 R): 0.3058
+2. 발달상권 (상권 구분 코드 D): 0.1854
+3. 교육 지출: 0.1745
+4. 남성 생활인구: 0.0889
+5. 의류 지출: 0.0558
 
-**Key Finding**: Traditional markets and developed commercial areas emerged as the most critical factors, followed by education-related spending patterns.
+**핵심 발견**: 전통시장과 발달상권이 가장 중요한 요인으로 나타났으며, 교육 관련 지출 패턴이 그 다음으로 중요했습니다.
 
-### 5. Deep Learning: Transformer Model
+### 5. 딥러닝: Transformer 모델
 
-#### Model Architecture
-- Transformer layers: 2
-- Attention heads: 4
-- Batch size: 64
-- Epochs: 1000 (with early stopping after 50 epochs without improvement)
-- Optimizer: Adam
-- Loss function: Categorical Cross-Entropy with Softmax activation
+#### 모델 아키텍처
 
-#### Training Configuration
-- Train-test split: 80%-20%
-- Data normalization: Applied to all features
-- Target encoding: One-hot encoding for 4-class classification
-- Input dimensions: 52 features
-- Output dimensions: 4 classes (gentrification stages)
+- Transformer 레이어: 2개
+- Attention 헤드: 4개
+- 배치 크기: 64
+- 에포크: 1000 (50 에포크 개선 없을 시 조기 종료)
+- 옵티마이저: Adam
+- 손실 함수: Categorical Cross-Entropy with Softmax
 
-#### Performance Metrics
-- **Validation Loss**: 0.0092
-- **Accuracy**: 99%
+#### 학습 설정
+
+- 학습-테스트 분할: 80%-20%
+- 데이터 정규화: 모든 특성에 적용
+- 타겟 인코딩: 4클래스 분류를 위한 One-hot 인코딩
+- 입력 차원: 52개 특성
+- 출력 차원: 4개 클래스 (젠트리피케이션 단계)
+
+#### 성능 지표
+
+- **검증 손실**: 0.0092
+- **정확도**: 99%
 - **RMSE**: 0.0641
 
-#### Attention Weight Analysis
-The attention mechanism revealed which features the model focused on most:
+#### Attention 가중치 분석
 
-**Highest Positive Impact:**
-- Age 10s living population: 0.8325
-- Attraction facilities count: 0.7688
-- Average closure business duration: 0.6877
-- Age 20s living population: 0.4971
-- Bus stop count: 0.4380
+Attention 메커니즘을 통해 모델이 집중한 특성 분석:
 
-**Lowest/Negative Impact:**
-- University count: -0.8070
-- Tuesday living population: -0.8006
-- Age 40s living population: -0.5029
-- Gentrification binary indicator: -0.4775
-- Time slot 6 (20:00-24:00) population: -0.4754
+**긍정적 영향 (높은 가중치)**
+- 10대 생활인구: 0.8325
+- 집객시설 수: 0.7688
+- 평균 폐업 사업체 기간: 0.6877
+- 20대 생활인구: 0.4971
+- 버스정류장 수: 0.4380
 
-### 6. 2023 Prediction Results
-Applied the trained Transformer model to Q1 2023 data (342 commercial districts):
+**부정적 영향 (낮은 가중치)**
+- 대학교 수: -0.8070
+- 화요일 생활인구: -0.8006
+- 40대 생활인구: -0.5029
+- 젠트리피케이션 이진 지표: -0.4775
+- 시간대 6 (20:00-24:00) 인구: -0.4754
 
-- **Cluster 0 (Warning Stage)**: 14 districts (4.1%)
-- **Cluster 1 (Initial Stage)**: 176 districts (51.5%)
-- **Cluster 2 (Risk Stage)**: 6 districts (1.8%)
-- **Cluster 3 (Caution Stage)**: 146 districts (42.7%)
+### 6. 2023년 예측 결과
 
-**High-Risk Districts (Stage 3 - Risk):**
-- Omokgyo Station
-- Guro Digital Complex
-- Gangnam Eulji Hospital
-- Eonju Station (Cha Hospital)
-- Cheongdam Intersection (Cheongdam Luxury Street)
-- Gaerong Station
+학습된 Transformer 모델을 2023년 1분기 데이터 (342개 상권)에 적용:
 
-## Key Findings
+- **군집 0 (경고 단계)**: 14개 상권 (4.1%)
+- **군집 1 (초기 단계)**: 176개 상권 (51.5%)
+- **군집 2 (위험 단계)**: 6개 상권 (1.8%)
+- **군집 3 (주의 단계)**: 146개 상권 (42.7%)
 
-### Gentrification Diagnosis (2022)
+**고위험 상권 (3단계 - 위험)**
+- 오목교역
+- 구로디지털단지
+- 강남을지병원
+- 언주역(차병원)
+- 청담사거리(청담명품거리)
+- 개롱역
+
+## 주요 연구 결과
+
+### 2022년 젠트리피케이션 진단
+
 <img width="286" height="138" alt="Screenshot 2025-10-08 at 12 45 16" src="https://github.com/user-attachments/assets/ebd093b0-3c2e-4f83-8f4f-e981d32d26e4" />
 
-Visualization showing the actual gentrification status across districts in 2022, with color-coded severity levels based on observed data.
+2022년 상권별 실제 젠트리피케이션 현황을 보여주는 시각화로, 관측 데이터 기반 심각도 등급을 색상으로 구분했습니다.
 
-### Gentrification Prediction (2023)
+### 2023년 젠트리피케이션 예측
+
 <img width="246" height="162" alt="Screenshot 2025-10-08 at 12 45 02" src="https://github.com/user-attachments/assets/6f1e70fc-85f4-4ff3-84af-ab65764cf2dd" />
 
-Transformer model prediction for 2023, demonstrating the model's capability to forecast gentrification patterns using time-series analysis.
+Transformer 모델의 2023년 예측 결과로, 시계열 분석을 통한 젠트리피케이션 패턴 예측 능력을 보여줍니다.
 
-### Critical Insights
+### 핵심 인사이트
 
-**Primary Drivers:**
-   
+**주요 동인 요인**
+
 <img width="293" height="450" alt="Screenshot 2025-10-08 at 12 14 18" src="https://github.com/user-attachments/assets/a7792942-6854-49ce-9de9-20307e7f61bf" />
 
-1. **Commercial District Type**: Traditional markets (R) and developed commercial areas (D) showed the strongest correlation with gentrification progression
-2. **Education Expenditure**: High education spending indicates affluent population inflow, a key gentrification marker
-4. **Youth Demographics**: High concentration of people in their 10s and 20s signals changing neighborhood character
-5. **Infrastructure Density**: Attraction facilities and public transportation access accelerate gentrification
+1. **상권 유형**: 전통시장(R)과 발달상권(D)이 젠트리피케이션 진행과 가장 강한 상관관계
+2. **교육 지출**: 높은 교육비 지출은 부유층 유입을 의미하는 주요 젠트리피케이션 지표
+3. **청년 인구**: 10대와 20대 인구 집중도가 높으면 지역 특성 변화 신호
+4. **인프라 밀도**: 집객시설과 대중교통 접근성이 젠트리피케이션 가속화
 
+**모델 성능**
+- 딥러닝(Transformer)이 전통적 머신러닝 기법 대비 월등한 성능
+- 99% 정확도는 강건한 패턴 인식 능력 입증
+- 낮은 RMSE(0.0641)는 정밀한 단계 분류 가능함을 시사
 
-**Model Performance:**
-- Deep learning (Transformer) significantly outperformed traditional machine learning methods
-- 99% accuracy demonstrates robust pattern recognition capability
-- Low RMSE (0.0641) indicates precise stage classification
+**정책적 시사점**
+- 51.5% 상권이 초기 단계로 무분별한 젠트리피케이션 방지를 위한 모니터링 필요
+- 6개 고위험 상권은 즉각적인 개입 전략 필요
+- 조기 경보 시스템으로 정책입안자가 주민 이탈 전 보호 조치 시행 가능
 
-**Policy Implications:**
-- 51.5% of districts in initial stage require monitoring to prevent uncontrolled gentrification
-- 6 high-risk districts need immediate intervention strategies
-- Early warning system can help policymakers implement protective measures before displacement occurs
+## 사용 기술
 
-## Technologies Used
+### 프로그래밍 언어
 
-### Programming Languages
 - Python 3.x
 - SQL
 
-### Machine Learning Frameworks
-- Scikit-learn: Classical ML algorithms
-- PyTorch: Deep learning model implementation
-- PyCaret 3.2.0: Automated ML model selection and tuning
+### 머신러닝 프레임워크
 
-### Database
-- MariaDB: Relational database for data storage and integration
+- Scikit-learn: 전통적 ML 알고리즘
+- PyTorch: 딥러닝 모델 구현
+- PyCaret 3.2.0: 자동화된 ML 모델 선정 및 튜닝
 
-### Data Processing Libraries
-- Pandas: Data manipulation and analysis
-- NumPy: Numerical computations
-- Papaparse: CSV processing
+### 데이터베이스
 
-### Visualization Tools
-- Matplotlib: Static visualizations
-- Seaborn: Statistical graphics
-- PCA: Dimensionality reduction visualization
+- MariaDB: 데이터 저장 및 통합을 위한 관계형 데이터베이스
 
-## Results Summary
+### 데이터 처리 라이브러리
 
-### Model Comparison
+- Pandas: 데이터 조작 및 분석
+- NumPy: 수치 연산
+- Papaparse: CSV 처리
 
-| Model | Accuracy/RMSE | Key Strength |
-|-------|---------------|--------------|
-| Logistic Regression | 59.2% accuracy | Baseline model |
-| Extra Trees Regressor | 0.0545 RMSE | Feature importance analysis |
-| Random Forest Regressor | 0.0532 RMSE | Robust predictions |
-| **Transformer (Final)** | **99% / 0.0641 RMSE** | **Best overall performance** |
+### 시각화 도구
 
-### Research Contributions
-1. **Data Integration**: Successfully unified multi-source urban datasets into a scalable relational database
-2. **Diagnosis Framework**: Implemented and validated the government's gentrification stage classification system
-3. **Predictive Capability**: Built an interpretable ML pipeline capable of forecasting gentrification risks with 99% accuracy
-4. **Feature Analysis**: Identified traditional markets, developed commercial areas, and education expenditure as primary gentrification indicators
-5. **Actionable Insights**: Provided spatial cluster visualization and district-level predictions for urban planning
+- Matplotlib: 정적 시각화
+- Seaborn: 통계 그래픽
+- PCA: 차원 축소 시각화
 
-### Limitations & Future Work
-- **Data Availability**: Income bracket data unavailable for 2023; future research should incorporate complete demographic indicators
-- **Time Series**: Current model uses quarterly snapshots; LSTM or temporal transformers could capture dynamic trends
-- **External Factors**: Policy changes, COVID-19 impacts, and macro-economic conditions not fully integrated
-- **Validation**: Longitudinal validation needed to assess prediction accuracy against actual 2023-2024 outcomes
+## 결과 요약
 
-## Team & Contributions
+### 모델 비교
 
-**Project Type**: Capstone Design Program  
-**Institution**: Hankuk University of Foreign Studies  
-**Department**: Artificial Intelligence Convergence – Business AI Track  
-**Period**: Fall 2023
+| 모델 | 정확도/RMSE | 주요 강점 |
+|------|-------------|-----------|
+| 로지스틱 회귀 | 59.2% 정확도 | 기준 모델 |
+| Extra Trees Regressor | 0.0545 RMSE | 특성 중요도 분석 |
+| Random Forest Regressor | 0.0532 RMSE | 강건한 예측 |
+| **Transformer (최종)** | **99% / 0.0641 RMSE** | **최고 종합 성능** |
 
-**Team Members:**
-- Kim Seonmin (GBT, Class of 2020) - Project Leader, Database Design, Model Architecture
-- Park Hwarang (Hungarian Studies, Class of 2019) - Data Collection, Feature Engineering
-- Bang Eunseon (Japanese Language & Culture, Class of 2019) - Data Analysis, Visualization
-- Choi Yeonjae (English Interpretation & Translation, Class of 2020) - Machine Learning Implementation
+### 연구 기여도
 
-**Project Leader Responsibilities:**
-- Database schema design and SQL-based data integration
-- Transformer model architecture design and hyperparameter optimization
-- Attention mechanism analysis and feature importance interpretation
-- Spatial clustering visualization and predictive analytics
+1. **데이터 통합**: 다중 출처 도시 데이터셋을 확장 가능한 관계형 데이터베이스로 성공적 통합
+2. **진단 프레임워크**: 정부 젠트리피케이션 단계 분류 시스템 구현 및 검증
+3. **예측 능력**: 99% 정확도의 해석 가능한 ML 파이프라인 구축
+4. **특성 분석**: 전통시장, 발달상권, 교육 지출을 주요 젠트리피케이션 지표로 식별
+5. **실행 가능한 인사이트**: 도시계획을 위한 공간 군집 시각화 및 상권별 예측 제공
 
-## Citations
+### 한계점 및 향후 연구
 
-This research builds upon:
-- Ministry of Land, Infrastructure and Transport (2020). Gentrification Diagnosis System
-- Lee et al. (2019). Gentrification Indicator Development and Application
-- Kim & Park (2023). Place Identity Analysis of Gentrified Areas Using Big Data
+- **데이터 가용성**: 2023년 소득 구간 데이터 부재, 향후 연구에서 완전한 인구통계 지표 통합 필요
+- **시계열**: 현재 모델은 분기별 스냅샷 사용, LSTM이나 시간적 Transformer로 동적 추세 포착 가능
+- **외부 요인**: 정책 변화, COVID-19 영향, 거시경제 상황 미완전 통합
+- **검증**: 2023-2024년 실제 결과 대비 예측 정확도 평가를 위한 종단 검증 필요
 
-## Acknowledgments
+## 팀 및 기여
 
-This project was conducted as part of the Capstone Design Program at Hankuk University of Foreign Studies, Department of Artificial Intelligence Convergence – Business AI Track (Fall 2023). We thank the Seoul Metropolitan Government for providing open access to commercial district data through the Seoul Open Data Plaza.
+**프로젝트 유형**: 캡스톤 디자인 프로그램  
+**소속**: 한국외국어대학교  
+**학과**: AI 융합학부 - Business AI Track  
+**기간**: 2023년 2학기
 
+**팀원**
+- 김선민 (GBT, 2020학번) - 프로젝트 리더, 데이터베이스 설계, 모델 아키텍처
+- 박화랑 (헝가리어과, 2019학번) - 데이터 수집, 특성 엔지니어링
+- 방은선 (일본언어문화학부, 2019학번) - 데이터 분석, 시각화
+- 최연재 (영어통번역학과, 2020학번) - 머신러닝 구현
 
----
-## Notes from my refactor
+**프로젝트 리더 담당 업무**
+- 데이터베이스 스키마 설계 및 SQL 기반 데이터 통합
+- Transformer 모델 아키텍처 설계 및 하이퍼파라미터 최적화
+- Attention 메커니즘 분석 및 특성 중요도 해석
+- 공간 군집 시각화 및 예측 분석
 
-# Gentrification Prediction Capstone
+## 참고문헌
 
-Refactored toolkit for experimenting with gentrification prediction models. The project now exposes reusable Python modules plus simple CLI scripts for training a transformer classifier and running baseline classical ML demos.
+본 연구는 다음 자료를 기반으로 합니다:
+- 국토교통부 (2020). 젠트리피케이션 진단 시스템
+- 이 등 (2019). 젠트리피케이션 지표 개발 및 적용
+- 김 & 박 (2023). 빅데이터를 활용한 젠트리피케이션 지역의 장소정체성 분석
 
-## Repository Layout
+## 감사의 글
 
-- `src/gentrification/` – reusable code for data loading, model definition, training utilities, inference helpers, visualisation, and classic ML demos.
-- `scripts/` – command line entry points (`train_transformer.py`, `predict_transformer.py`).
-- `notebooks/` – original research notebooks preserved for reference.
-- `artifacts/` – default output directory for checkpoints and preprocessing artefacts (created after training).
-
-## Quick Start
-
-1. Install dependencies (example using pip):
-   ```bash
-   pip install torch scikit-learn pandas numpy matplotlib seaborn joblib
-   ```
-2. Train the transformer model on your CSV dataset:
-   ```bash
-   python scripts/train_transformer.py path/to/result_after_cluster.csv --target clust --feature-start 3
-   ```
-   Adjust `--drop-columns` or `--feature-columns` when your schema differs.
-3. Generate predictions for new data using the saved artefacts:
-   ```bash
-   python scripts/predict_transformer.py path/to/newdata2023.csv --artifacts artifacts --output predictions.csv
-   ```
-
-## Module Overview
-
-- `gentrification.data` – `DataConfig` for declaring dataset schema and `prepare_datasets` for building PyTorch dataloaders together with scalers and label encoders.
-- `gentrification.model` – `TransformerClassifier` exposes a batch-first multi-head attention model tailored for tabular data.
-- `gentrification.training` – `TrainingConfig` and `train_model` implement early-stopped optimisation with tracked metrics.
-- `gentrification.prediction` – utilities for loading checkpoints and producing batched predictions.
-- `gentrification.visualization` – helpers to convert attention weights into dataframes and bar charts.
-- `gentrification.demos` – reusable Iris/MNIST demo functions covering KNN, KMeans, and decision trees.
-
-## Next Steps
-
-- Extend `scripts/train_transformer.py` with custom logging or wandb integration when experimenting at scale.
-- Wrap data preprocessing (categorical encoding, imputation) before calling `prepare_datasets` if your inputs require it.
-
+본 프로젝트는 한국외국어대학교 AI 융합학부 Business AI Track의 2023년 2학기 캡스톤 디자인 프로그램의 일환으로 진행되었습니다. 서울시 열린 데이터 광장을 통해 상권 데이터를 공개한 서울시에 감사드립니다.
